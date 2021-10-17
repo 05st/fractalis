@@ -1,10 +1,16 @@
-CFLAGS = -std=c++20 -O2
-LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+SOURCES = $(wildcard src/*.cpp)
+HEADERS = $(wildcard src/*.h)
+INCLUDES = $(wildcard /usr/share/include/)
 
-Fractalis: main.cpp
-	g++ $(CFLAGS) -o Fractalis main.cpp $(LDFLAGS)
+INCLUDE_PARAMS = $(foreach d, $(INCLUDES), -I$d)
 
-test: Fractalis
+CFLAGS = -std=c++20
+LDFLAGS = -lglfw -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+
+Fractalis:
+	g++ $(CFLAGS) -o Fractalis glad.c $(SOURCES) $(HEADERS) $(LDFLAGS) $(INCLUDE_PARAMS)
+
+run: Fractalis
 	./Fractalis
 
 clean:
