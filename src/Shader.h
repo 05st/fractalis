@@ -11,6 +11,8 @@ public:
 
     void Bind();
     void Unbind();
+
+    unsigned int GetUniformLocation(const char* name);
 private:
     unsigned int shaderProgram;
 

@@ -6,10 +6,13 @@ public:
     void Run();
 private:
     GLFWwindow* window;
+    int windowSizeLoc;
 
     void Init();
     void Loop();
     void Clean();
 
     void Render();
+
+    void WindowSizeCallback(int width, int height);
 };

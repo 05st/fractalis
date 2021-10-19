@@ -1,11 +1,10 @@
 #include "Application.h"
 #include "Shader.h"
 
+#include <iostream>
 #include <stdexcept>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
+unsigned int width = 800, height = 600;
 
 void Application::Run() {
     this->Init();
@@ -19,7 +18,7 @@ void Application::Init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    this->window = glfwCreateWindow(800, 600, "Fractalis", nullptr, nullptr);
+    this->window = glfwCreateWindow(width, height, "Fractalis", nullptr, nullptr);
     if (!window)
         throw std::runtime_error("Failed to create GLFW window");
     
@@ -29,7 +28,12 @@ void Application::Init() {
         throw std::runtime_error("Failed to initialize GLAD");
 
     glViewport(0, 0, 800, 600);
-    glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(this->window, [](GLFWwindow* window, int nwidth, int nheight) {
+        width = nwidth;
+        height = nheight;
+        Application* app = (Application*)glfwGetWindowUserPointer(window);
+        app->WindowSizeCallback(width, height);
+    });
 
     // Setup shader program
     Shader shader = Shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
@@ -67,14 +71,29 @@ void Application::Init() {
     // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // glBindVertexArray(0);
+    
+    this->windowSizeLoc = shader.GetUniformLocation("windowSize");
+
+    // VSync
+    glfwSwapInterval(0);
 }
 
 void Application::Loop() {
+    double lastTime = glfwGetTime();
+    int nbFrames = 0;
     while (!glfwWindowShouldClose(this->window)) {
         this->Render();
 
         glfwSwapBuffers(this->window);
         glfwPollEvents();
+
+        double currentTime = glfwGetTime();
+        nbFrames++;
+        if (currentTime - lastTime >= 1.0) {
+            std::cout << (double)nbFrames << std::endl;
+            nbFrames = 0;
+            lastTime += 1.0;
+        }
     }
 }
 
@@ -87,5 +106,11 @@ void Application::Render() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glUniform2f(this->windowSizeLoc, width, height);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Application::WindowSizeCallback(int width, int height) {
+    glViewport(0, 0, width, height);
 }

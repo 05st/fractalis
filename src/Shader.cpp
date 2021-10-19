@@ -99,3 +99,7 @@ void Shader::Bind() {
 void Shader::Unbind() {
     glUseProgram(0);
 }
+
+unsigned int Shader::GetUniformLocation(const char* name) {
+    return glGetUniformLocation(this->shaderProgram, name);
+}
