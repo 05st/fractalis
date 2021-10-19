@@ -3,13 +3,13 @@
 
 class Application {
 public:
-    void run();
+    void Run();
 private:
     GLFWwindow* window;
 
-    void init();
-    void loop();
-    void clean();
+    void Init();
+    void Loop();
+    void Clean();
 
-    void render();
+    void Render();
 };
